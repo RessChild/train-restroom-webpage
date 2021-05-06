@@ -1,10 +1,14 @@
 import BasicFrame from "./frames/BasicFrame/BasicFrame";
 
-const frameRouter = [{
+const defaultFrameRoutePath = '/'
+
+const frameRoute = [
+    {
+        key: "basicFrame",
         path: '/',
         exact: false,
         component: BasicFrame,
     }
 ];
 
-export { frameRouter }
+export { defaultFrameRoutePath, frameRoute };

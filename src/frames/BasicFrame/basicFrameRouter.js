@@ -1,22 +1,28 @@
 import { MdCreateNewFolder } from "react-icons/md";
+import { GoReport } from "react-icons/go";
+
+import AddListView from "../../views/AddListView/AddListView";
+import ReportListView from "../../views/ReportListView/ReportListView";
 
 const defaultBasicFramePath = '/add-list'
 
-const basicFrameRouter = [
+const basicFrameRoute = [
     {
+        key: "addRequest",
         title: '추가 요청',
         icon: MdCreateNewFolder,
         path: '/add-list',
-        exact: false,
-        component: null,
+        exact: true,
+        component: AddListView,
     },
     {
+        key: "reportRequest",
         title: "수정 요청",
-        icon: MdCreateNewFolder,
+        icon: GoReport,
         path: '/report-list',
-        exact: false,
-        component: null,
+        exact: true,
+        component: ReportListView,
     }
 ];
 
-export { defaultBasicFramePath, basicFrameRouter };
+export { defaultBasicFramePath, basicFrameRoute };

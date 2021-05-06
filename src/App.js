@@ -1,18 +1,19 @@
 
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-import { frameRouter } from "./router";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import { defaultFrameRoutePath, frameRoute } from "./router";
 
 const App = () => {
   
-  const createRoute = () => {
-    return frameRouter.map( route => <Route {...route} />);
+  const createRouter = () => {
+    return <Switch>
+      { frameRoute.map( route => <Route key={`app-router-${route.key}`} {...route} /> ) }
+      <Redirect to={defaultFrameRoutePath} />
+    </Switch>
   }
 
   return (
     <BrowserRouter>
-      <Switch>
-      { createRoute() }
-      </Switch>
+      { createRouter() }
     </BrowserRouter>
   );
 }

@@ -1,0 +1,7 @@
+.view-frame {
+    flex: 1;
+    padding: 2rem;
+    padding-top: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+}
