@@ -63,6 +63,7 @@ const BasicFrame = ({ history, location, match }) => {
             { createMenu() }
             </Box>
             <Box className="right-side">
+            { select &&
                 <Box className="view-title">
                     <Box className="view-title-icon">
                         { <select.icon size="2.5rem" /> }
@@ -71,6 +72,7 @@ const BasicFrame = ({ history, location, match }) => {
                         { select.title }
                     </Box>
                 </Box>
+            }
             { createRouter() }
             </Box>
         </Box>

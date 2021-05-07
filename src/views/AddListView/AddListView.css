@@ -1,0 +1,27 @@
+.opt-bar {
+    /* background-color: #c0c0c0; */
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 테이블 헤더 css */
+.table-header {
+    /* background-color: blue; */
+    border-top: 2px solid #a0a0a0;
+    border-bottom: 2px solid #a0a0a0;
+}
+.table-header-cell {
+    /* stickyHeader: true; */
+}
+
+/* 테이블 바디 css */
+
+.table-body {
+    /* background-color: cadetblue; */
+}
+.table-body-row:hover {
+    background-color: #c0c0c0;
+    color: azure;
+}

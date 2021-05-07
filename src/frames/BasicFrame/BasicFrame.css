@@ -14,6 +14,9 @@
     display: flex;
     flex-direction: column;
     border-right: 3px solid black;
+
+    /* z-index: 1;
+    background-color: #ffffff; */
 }
 .right-side {
     flex: 1;
@@ -24,6 +27,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    
+    position: relative;
 }
 
 /* 좌측 사이드 css */
@@ -38,11 +43,11 @@
     font-weight: 700;
 }
 .menu-item:hover {
-    background-color: #9e9e9e;
-    color: honeydew;
+    color: coral;
 }
 .selected-item {
-    color: coral;
+    background-color: #9e9e9e;
+    color: honeydew;
 }
 
 /* 우측 사이드 css */

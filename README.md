@@ -7,6 +7,7 @@
 - react-router-dom
 - material-ui, @material-ui/core
 - react-icons
+- react-spinners-css
 
 # 진행사항
 1. 2021/05/04
@@ -20,3 +21,7 @@
 3. 2021/05/06
   - 메뉴 클릭이 안된 경우, 선택된 메뉴값을 기본으로 설정해주는 과정 구성
   - router view css 작성
+4. 2021/05/08
+  - material-ui 의 table 을 기반으로 목록 출력
+  - 로딩시 사용할 이벤트 방지용 필터 컴포넌트 구성 ( LoadingFilter.js )
+    로딩 애니메이션에 react-spinners-css 사용 ( https://github.com/JoshK2/react-spinners-css )
