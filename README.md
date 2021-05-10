@@ -25,3 +25,14 @@
   - material-ui 의 table 을 기반으로 목록 출력
   - 로딩시 사용할 이벤트 방지용 필터 컴포넌트 구성 ( LoadingFilter.js )
     로딩 애니메이션에 react-spinners-css 사용 ( https://github.com/JoshK2/react-spinners-css )
+5. 2021/05/10
+  - 체크박스 설정
+
+# 해야할 것
+- 처리 완료 여부는 수동으로 판단
+
+# 코딩 TMI
+- react-router-dom 의 경우, exact 가 붙으면 하위 컴포넌트의 routing 에서 문제가 생길 수 있음
+  ( exact 를 사용하는 경우, parmas 가 있는지 없는지 명확히 적어줘야 함 )
+- css 의 fixed 는 최상위 window 를 기점으로 잡음.
+  absolute 는 relative 설정된 컴포넌트 정보를 따라감 (기본은 window)
