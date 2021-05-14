@@ -1,9 +1,15 @@
 .opt-bar {
-    /* background-color: #c0c0c0; */
+    background-color: #d2d2d2;
     padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+
+/* 테이블 옵션 */
+.toggle-btn {
+    
 }
 
 /* 테이블 헤더 css */
@@ -23,5 +29,12 @@
 }
 .table-body-row:hover {
     background-color: #c0c0c0;
-    color: azure;
+    /* color: azure; */
+}
+
+.isClear-row {
+    background: aquamarine;
+}
+.isRead-row {
+    background-color: aqua;
 }

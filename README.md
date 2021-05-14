@@ -26,7 +26,10 @@
   - 로딩시 사용할 이벤트 방지용 필터 컴포넌트 구성 ( LoadingFilter.js )
     로딩 애니메이션에 react-spinners-css 사용 ( https://github.com/JoshK2/react-spinners-css )
 5. 2021/05/10
-  - 체크박스 설정
+  - 체크박스 설정 + 로딩화면 설정
+  - report-list 도 형태 잡아놓고 띄워놓기 까진 끝
+6. 2021/05/14
+  - 아이콘 배치 (필터용)
 
 # 해야할 것
 - 처리 완료 여부는 수동으로 판단
