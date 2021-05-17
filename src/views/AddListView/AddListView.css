@@ -5,11 +5,21 @@
     align-items: center;
     justify-content: space-between;
 }
-
-
-/* 테이블 옵션 */
-.toggle-btn {
+.select-bar {
+    background-color: black;
+    color: whitesmoke;
+    font-weight: 700;
+    padding: 0.7rem 1.5rem;
     
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 체크박스 바 css */
+.select-bar-btn:disabled {
+    /* color: blue; */
+    opacity: 50%;
 }
 
 /* 테이블 헤더 css */
@@ -23,18 +33,10 @@
 }
 
 /* 테이블 바디 css */
-
 .table-body {
     /* background-color: cadetblue; */
 }
 .table-body-row:hover {
     background-color: #c0c0c0;
     /* color: azure; */
-}
-
-.isClear-row {
-    background: aquamarine;
-}
-.isRead-row {
-    background-color: aqua;
 }

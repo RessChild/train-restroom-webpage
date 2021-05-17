@@ -1,8 +1,9 @@
 import { Box, Checkbox, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@material-ui/core";
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import axios from "axios";
 
-import { GoMailRead, GoMail, GoCheck } from "react-icons/go"
+import { GoChecklist, GoCheck, GoTrashcan } from "react-icons/go"
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
 
@@ -17,8 +18,8 @@ const AddListView = () => {
 
     const source = axios.CancelToken.source();
 
-    const [ state, dispatch ]  = useReducer(addListRudcer, addListInit); 
-    const { filter, addList, checkList, isLoading } = state;
+    const [ state, dispatch ] = useReducer(addListRudcer, addListInit); 
+    const { totalPage, filter, addList, checkList, isLoading } = state;
 
     // axios 요청
     const axiosRequest = async () => {
@@ -26,7 +27,7 @@ const AddListView = () => {
         try {
             const { data } = await axios.post('/back-office/add-list', filter, { cancelToken: source.token });
             console.log(data);
-            dispatch({ type: AddListAction.UPDATE_STATE, data: { addList: data, isLoading: false } });
+            dispatch({ type: AddListAction.UPDATE_STATE, data: { ...data, checkList: {}, isLoading: false } });
         } catch (e) {
             // console.log("addListView error:", e);
             if( axios.isCancel(e) ) return;
@@ -57,25 +58,67 @@ const AddListView = () => {
     // 필터용 토글 버튼
     const onClickToggleBtn = ({ currentTarget: { id }}) => {
         const [ target, value ] = id.split('-');
-        dispatch({ type: AddListAction.UPDATE_FILTER, target: target, data: { [value]: !filter[value] } });
+        dispatch({ type: AddListAction.UPDATE_FILTER, data: { [value]: !filter[value] } });
     };
+    // 페이지 이동 버튼
+    const onClickPageBtnLeft = () => {
+        const PAGE = Math.max(0, filter.page - 1);
+        dispatch({ type: AddListAction.UPDATE_FILTER, data: { "page": PAGE }});
+    }
+    const onClickPageBtnRight = () => {
+        const PAGE = Math.min(totalPage, filter.page + 1);
+        dispatch({ type: AddListAction.UPDATE_FILTER, data: { "page": PAGE }});
+    }
+
+    // 체크리스트 액션버튼
+    const onClickActionRead = async () => { // 목록 읽음 처리
+        const cnt = addList.reduce((acc, add) => acc + (checkList[add._id] ? 1 : 0), 0);
+        const yesOrNo = window.confirm(`선택한 ${cnt} 개의 추가 건의를 삭제합니다.`);
+
+        if( !yesOrNo ) return; // 거절하면 종료
+        const { data } = await axios.post('/back-office/add-read', {}, { cancelToken: source.token });
+        console.log(data);
+    }
+    const onClickActionRemove = async () => { // 목록 삭제
+        const cnt = addList.reduce((acc, add) => acc + (checkList[add._id] ? 1 : 0), 0);
+        const yesOrNo = window.confirm(`선택한 ${cnt} 개의 추가 건의를 확인합니다.`);
+
+        if( !yesOrNo ) return; // 거절하면 종료
+    }
 
     // 고민해야할 부분
-    // 1. 로딩중인 경우
-    // 2. 요청 리스트가 없는 경우
+    // 1. 요청 리스트가 없는 경우
     return <>
         { isLoading && <LoadingFilter /> }
         <Box className="view-frame">
             <Box className="opt-bar">
                 <Box>
                     <IconButton className="toggle-btn" id="filter-isRead" onClick={onClickToggleBtn}>
-                        <GoMail color={filter.isRead ? "369F36" : "969696"} size="2rem"/>
-                    </IconButton>
-                    <IconButton className="toggle-btn" id="filter-isClear" onClick={onClickToggleBtn}>
-                        <GoCheck color={filter.isClear ? "FF9100" : "969696"} size="2rem"/>
+                        <GoChecklist color={filter.isRead ? "369F36" /*"FF9100"*/ : "969696"} size="2rem"/>
                     </IconButton>
                 </Box>
-                <Box>툴이 들어갈 공간</Box>
+                <Box>
+                    <IconButton disabled={filter.page <= 0} onClick={onClickPageBtnLeft}>
+                        <MdKeyboardArrowLeft />
+                    </IconButton>
+                    { `page ${filter.page + 1} / ${totalPage + 1}` }
+                    <IconButton disabled={filter.page >= totalPage} onClick={onClickPageBtnRight}>
+                        <MdKeyboardArrowRight />
+                    </IconButton>
+                </Box>
+            </Box>
+            <Box className="select-bar">
+                <Box>
+                    { addList.reduce((acc, add) => acc + (checkList[add._id] ? 1 : 0), 0) } 개 선택
+                </Box>
+                <Box>
+                    <IconButton className="select-bar-btn" disabled={ !(addList.reduce((acc, add) => acc | checkList[add._id], false)) } onClick={onClickActionRead}>
+                        <GoCheck color="#FF9100"/>
+                    </IconButton>
+                    <IconButton className="select-bar-btn" disabled={ !(addList.reduce((acc, add) => acc | checkList[add._id], false)) } onClick={onClickActionRemove}>
+                        <GoTrashcan color="red"/>
+                    </IconButton>
+                </Box>
             </Box>
             <TableContainer>
                 <Table size="small">
@@ -84,16 +127,16 @@ const AddListView = () => {
                             <TableCell padding="checkbox">
                                 <Checkbox onChange={onChangeCheckboxAll} checked={ addList.reduce((acc, add) => acc && !!checkList[add._id], true) } />
                             </TableCell>
-                            { tableColumn.map( column => <TableCell className="table-header-cell" key={`head-${column.key}`} align="center">{ column.name }</TableCell>)}
+                            { tableColumn.map( column => <TableCell className="table-header-cell" padding={column.padding && column.padding} key={`head-${column.key}`} align="center">{ column.name }</TableCell>)}
                         </TableRow>
                     </TableHead>
                     <TableBody className="table-body">
                         {
-                            addList.map( add => <TableRow className={`table-body-row ${add.isClear && "isClear-row"} ${add.isRead && "isRead-row"}`} key={`row-${add._id}`}>
+                            addList.map( add => <TableRow className={`table-body-row`} key={`row-${add._id}`}>
                                 <TableCell padding="checkbox">
                                     <Checkbox id={`checkbox-${add._id}`} key={`checkbox-${add._id}`} checked={!!checkList[add._id]} onChange={onChangeCheckbox}/>
                                 </TableCell>
-                                { tableColumn.map( column => <TableCell key={`row-${add._id}-${column.key}`}>{ add[column.key] }</TableCell>) }
+                                { tableColumn.map( ({ key, filter, padding }) => <TableCell padding={padding} key={`row-${add._id}-${key}`}>{ filter ? filter[add[key]] : add[key] }</TableCell>) }
                             </TableRow> )
                         }
                     </TableBody>

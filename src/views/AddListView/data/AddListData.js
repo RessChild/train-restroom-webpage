@@ -1,4 +1,18 @@
+// import { GoMailRead, GoMail, GoCheck } from "react-icons/go"
+import { MdNewReleases } from "react-icons/md";
+
+const readFilter = {
+    true: <></>,
+    false: <MdNewReleases size="0.9rem" color="orange" />
+}
+
 export const tableColumn = [
+    {
+        key: "isRead",
+        name: "",
+        filter: readFilter,
+        padding: "checkbox"
+    },
     {
         key: "createdAt",
         name: "작성일자"

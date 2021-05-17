@@ -1,14 +1,16 @@
 const addListInit = {
     filter: {
         isRead: true,
-        isClear: true,
+        page: 0,
     },
+    totalPage: 0,
     addList: [],
-    checkList: [],
+    checkList: {},
     isLoading: false,
 };
 
 const AddListAction = {
+
     UPDATE_STATE: "UPDATE_INPUT",
     UPDATE_FILTER: "UPDATE_FILTER",
 };
@@ -23,9 +25,10 @@ const addListRudcer = (state, action) => {
         case AddListAction.UPDATE_FILTER:
             return {
                 ...state,
-                [action.target]: {
-                    ...state[action.target],
-                    ...action.data,
+                "filter": {
+                    ...state["filter"],
+                    "page": 0, // 필터값이 바뀌면 첫 페이지로 이동
+                    ...action.data, // 페이지 값이 변한 경우, 덮어씀
                 }
             };
         default:
