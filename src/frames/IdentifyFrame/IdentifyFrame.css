@@ -1,0 +1,22 @@
+.identify-frame {
+    background-color: #DDDDDD;
+    flex-direction: column;
+}
+
+/* 페이지 구성요소 */
+.page-intro {
+    margin: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+.page-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 입력 컴포넌트 */
+.password-field {
+    /* background-color: #fff; */
+    width: 17rem;
+}

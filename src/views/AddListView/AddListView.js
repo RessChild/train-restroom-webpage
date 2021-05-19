@@ -27,7 +27,10 @@ const AddListView = () => {
         try {
             const { data } = await axios.post('/back-office/add-list', filter, { cancelToken: source.token });
             console.log(data);
-            dispatch({ type: AddListAction.UPDATE_STATE, data: { ...data, checkList: {}, isLoading: false } });
+            // 고를 수 있는 페이지 최대치를 넘어가면 최대 페이지 갱신
+            // 그 외엔 입력값 처리
+            if ( data.totalPage < filter.page ) dispatch({ type: AddListAction.UPDATE_FILTER, data: { "page": Math.min(filter.page, data.totalPage) }});
+            else dispatch({ type: AddListAction.UPDATE_STATE, data: { ...data, checkList: {}, isLoading: false } });
         } catch (e) {
             // console.log("addListView error:", e);
             if( axios.isCancel(e) ) return;
@@ -72,16 +75,23 @@ const AddListView = () => {
 
     // 체크리스트 액션버튼
     const onClickActionRead = async () => { // 목록 읽음 처리
-        const cnt = addList.reduce((acc, add) => acc + (checkList[add._id] ? 1 : 0), 0);
-        const yesOrNo = window.confirm(`선택한 ${cnt} 개의 추가 건의를 삭제합니다.`);
+        const list = addList.filter( add => checkList[add._id] ).map( ({_id}) => _id );
+        const yesOrNo = window.confirm(`선택한 ${list.length} 개의 추가 건의를 확인합니다.`);
 
         if( !yesOrNo ) return; // 거절하면 종료
-        const { data } = await axios.post('/back-office/add-read', {}, { cancelToken: source.token });
-        console.log(data);
+        try {
+            const { data } = await axios.post('/back-office/add-read', { list }, { cancelToken: source.token });
+            // console.log(data);
+            if ( !data.ok || !data.nModified ) return; // 갱신된 값이 없으면 무시
+            axiosRequest();
+        } catch (e) {
+            if(axios.isCancel(e)) return;
+            alert("승인 처리 중, 에러가 발생하였습니다.");
+        }
     }
     const onClickActionRemove = async () => { // 목록 삭제
-        const cnt = addList.reduce((acc, add) => acc + (checkList[add._id] ? 1 : 0), 0);
-        const yesOrNo = window.confirm(`선택한 ${cnt} 개의 추가 건의를 확인합니다.`);
+        const list = addList.filter( add => checkList[add._id] ).map( ({_id}) => _id );
+        const yesOrNo = window.confirm(`선택한 ${list.length} 개의 추가 건의를 삭제합니다.`);
 
         if( !yesOrNo ) return; // 거절하면 종료
     }

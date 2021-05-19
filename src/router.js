@@ -1,11 +1,18 @@
 import BasicFrame from "./frames/BasicFrame/BasicFrame";
+import IdentifyFrame from "./frames/IdentifyFrame/IdentifyFrame";
 
-const defaultFrameRoutePath = '/'
+const defaultFrameRoutePath = `/identify`
 
 const frameRoute = [
     {
+        key: "identifyFrame",
+        path: "/identify",
+        exact: true,
+        component: IdentifyFrame,
+    },
+    {
         key: "basicFrame",
-        path: '/',
+        path: "/back-office",
         exact: false,
         component: BasicFrame,
     }

@@ -6,9 +6,12 @@ import AddListView from "../../views/AddListView/AddListView";
 import ReportListView from "../../views/ReportListView/ReportListView";
 import UpdateView from "../../views/UpdateView/UpdateView";
 
-const defaultBasicFramePath = '/add-list'
+// 앞에 붙을 고정 PATH
+// 이부분 수정 필요
+const CONST_PATH = '/back-office';
+const defaultBasicFramePath = `${CONST_PATH}/add-list`;
 
-const basicFrameRoute = [
+const route = [
     {
         key: "addRequest",
         title: '추가 요청',
@@ -34,5 +37,7 @@ const basicFrameRoute = [
         component: UpdateView,        
     }
 ];
+
+const basicFrameRoute = route.map(({ path, ...others }) => ({ ...others, path: `${CONST_PATH}${path}` }));
 
 export { defaultBasicFramePath, basicFrameRoute };

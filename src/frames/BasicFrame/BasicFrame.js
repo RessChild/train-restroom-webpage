@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { Box } from "@material-ui/core";
 
-import "./BasicFrame.css";
 import { defaultBasicFramePath, basicFrameRoute } from "./basicFrameRouter";
+
+import "../DefaultFrame.css";
+import "./BasicFrame.css";
 
 const BasicFrame = ({ history, location, match }) => {
 
@@ -58,7 +60,7 @@ const BasicFrame = ({ history, location, match }) => {
     };
 
     return (
-        <Box className="frame">
+        <Box className="frame basic-frame">
             <Box className="left-side">
             { createMenu() }
             </Box>
