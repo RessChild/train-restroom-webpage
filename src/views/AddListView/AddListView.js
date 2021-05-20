@@ -14,7 +14,7 @@ import "../DefaultView.css";
 import "./AddListView.css";
 
 // 추가요청 정리 리스트
-const AddListView = () => {
+const AddListView = ({ history }) => {
 
     const source = axios.CancelToken.source();
 
@@ -25,15 +25,26 @@ const AddListView = () => {
     const axiosRequest = async () => {
         dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post('/back-office/add-list', filter, { cancelToken: source.token });
+            const { data } = await axios.post('/back-office/add-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
             console.log(data);
             // 고를 수 있는 페이지 최대치를 넘어가면 최대 페이지 갱신
             // 그 외엔 입력값 처리
+            if( !data ) return alert('권한이 없어요.');
             if ( data.totalPage < filter.page ) dispatch({ type: AddListAction.UPDATE_FILTER, data: { "page": Math.min(filter.page, data.totalPage) }});
             else dispatch({ type: AddListAction.UPDATE_STATE, data: { ...data, checkList: {}, isLoading: false } });
         } catch (e) {
-            // console.log("addListView error:", e);
+            // cancel 로 인한 경우
             if( axios.isCancel(e) ) return;
+            const { response } = e;
+
+            // 권한 만료 확인
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+
+            // 기타 문제
             alert("axios request error!");
             dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: false }});
         }

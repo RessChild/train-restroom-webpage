@@ -9,15 +9,9 @@ import "./BasicFrame.css";
 
 const BasicFrame = ({ history, location, match }) => {
 
-    /*
-    useEffect(() => {
-        console.log(history, location, match);
-        // console.log('BasicFrame useEffect');
-    }, [history, location, match]);
-    */
-
     // 선택된 메뉴
     const [ select, setSelect ] = useState(null);
+    const [ jwt, setJwt ] = useState();
 
     // url에 따라 선택된 버튼 변경
     useEffect(() => {
@@ -58,6 +52,13 @@ const BasicFrame = ({ history, location, match }) => {
             <Redirect to={defaultBasicFramePath} />
         </Switch>
     };
+
+    // 권한 여부 확인
+    useEffect(() => {
+        const jwt = sessionStorage.getItem('jwt');
+        console.log(jwt, typeof jwt);
+        if( !jwt ) history.replace('/identify');
+    }, []);
 
     return (
         <Box className="frame basic-frame">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Box, Button, IconButton, TextField } from "@material-ui/core";
 
@@ -15,7 +15,6 @@ const IdentifyFrame = ({ history }) => {
     const [ isLoading, setIsLoading ] = useState(false);
     const [ pw, setPw ] = useState('');
 
-
     // 입력 (input)
     const onChangePw = ({ currentTarget: { value }}) => setPw(value);
 
@@ -24,8 +23,12 @@ const IdentifyFrame = ({ history }) => {
         setIsLoading(true);
         try {
             // 암호 확인
-            const { data: { login } } = await axios.post('/back-office', { pw });
-            if( login ) history.push('/back-office');
+            const { data: { login, jwt } } = await axios.post('/back-office', { pw });
+            if( login && jwt ) {
+                // console.log(jwt);
+                sessionStorage.setItem('jwt', jwt); // jwt 정보 저장
+                history.push('/back-office');
+            }
             else {
                 alert('비밀번호가 틀렸습니다. 다시 시도해주세요');
                 setPw('');
@@ -38,6 +41,14 @@ const IdentifyFrame = ({ history }) => {
             throw new Error('login page error');
         }
     }
+
+    // 로그인 여부 확인
+    useEffect(() => {
+        // 이미 로그인한 경우, 건너뜀
+        // sessionStorage.removeItem('jwt');
+        const jwt = sessionStorage.getItem('jwt');
+        if( jwt ) history.replace('/back-office');
+    }, []);
 
     return <Box className="frame identify-frame">
         { isLoading && <LoadingFilter /> }
