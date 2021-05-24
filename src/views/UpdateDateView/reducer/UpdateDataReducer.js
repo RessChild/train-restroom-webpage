@@ -1,27 +1,27 @@
-const reportListInit = {
+const updateDataInit = {
     filter: {
-        isRead: true,
-        page: 0,
+        lnCd: '',
+        stinCd: '',
     },
-    totalPage: 0,
-    reportList: [],
-    checkList: [],
+    lineList: [], // 노선 정보
+    stationList: [], // 노선별 역 정보
+    restroomList: [], // 역별 화장실 정보
     isLoading: false,
 };
 
-const ReportListAction = {
+const UpdateDataAction = {
     UPDATE_STATE: "UPDATE_INPUT",
     UPDATE_FILTER: "UPDATE_FILTER",
 };
 
-const reportListRudcer = (state, action) => {
+const updateDataRudcer = (state, action) => {
     switch (action.type) {
-        case ReportListAction.UPDATE_STATE:
+        case UpdateDataAction.UPDATE_STATE:
             return {
                 ...state,
                 ...action.data,
             };
-        case ReportListAction.UPDATE_FILTER:
+        case UpdateDataAction.UPDATE_FILTER:
             return {
                 ...state,
                 "filter": {
@@ -36,5 +36,5 @@ const reportListRudcer = (state, action) => {
 };
 
 export {
-    reportListInit, ReportListAction, reportListRudcer
+    updateDataInit, UpdateDataAction, updateDataRudcer
 };

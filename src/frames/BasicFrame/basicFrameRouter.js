@@ -4,7 +4,7 @@ import { GrUpdate } from "react-icons/gr";
 
 import AddListView from "../../views/AddListView/AddListView";
 import ReportListView from "../../views/ReportListView/ReportListView";
-import UpdateView from "../../views/UpdateView/UpdateView";
+import UpdateDateView from "../../views/UpdateDateView/UpdateDataView";
 
 // 앞에 붙을 고정 PATH
 // 이부분 수정 필요
@@ -34,7 +34,7 @@ const route = [
         icon: GrUpdate,
         path: '/update-data',
         exact: true,
-        component: UpdateView,        
+        component: UpdateDateView,        
     }
 ];
 

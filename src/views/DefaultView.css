@@ -8,3 +8,20 @@
     display: flex;
     flex-direction: column;
 }
+.opt-bar {
+    background-color: #d2d2d2;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.select-bar {
+    background-color: black;
+    color: whitesmoke;
+    font-weight: 700;
+    padding: 0.7rem 1.5rem;
+    
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

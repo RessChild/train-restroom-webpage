@@ -50,7 +50,9 @@
     최상단 frame 에서 jwt를 보관하고, 하위 view 로 값을 내려보내고 싶은데, jwt 만료기간이 다 되서 새 값으로 갱신할 때 처리가 필요함
     sessionStorage 에서 저장하고 관리중이라, 해당 값이 바뀔때 useEffect로 자동갱신은 안됨
     so, 상위에서 값을 관리할려면 값을 바꾸는 함수가 따로 필요함
-  - 일단은 각 view 에서 jwt 를 sessionStorage 에서 받아와서 사용하는형태로
+  - 일단은 각 view 에서 jwt 를 sessionStorage 에서 받아와서 사용하는 형태로 구현
+11. 2021/05/24
+  - edit 기능 관련 구축 ( UpdateDataView )
 
 # 해야할 것
 - 페이지마다 15개씩 쪼개서 처리

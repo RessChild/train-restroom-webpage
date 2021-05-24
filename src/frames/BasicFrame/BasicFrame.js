@@ -11,7 +11,6 @@ const BasicFrame = ({ history, location, match }) => {
 
     // 선택된 메뉴
     const [ select, setSelect ] = useState(null);
-    const [ jwt, setJwt ] = useState();
 
     // url에 따라 선택된 버튼 변경
     useEffect(() => {
@@ -56,9 +55,8 @@ const BasicFrame = ({ history, location, match }) => {
     // 권한 여부 확인
     useEffect(() => {
         const jwt = sessionStorage.getItem('jwt');
-        console.log(jwt, typeof jwt);
         if( !jwt ) history.replace('/identify');
-    }, []);
+    }, [history]);
 
     return (
         <Box className="frame basic-frame">

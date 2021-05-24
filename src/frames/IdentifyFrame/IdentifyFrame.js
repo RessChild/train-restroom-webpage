@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Button, IconButton, TextField } from "@material-ui/core";
+import { Box, Button, TextField } from "@material-ui/core";
 
 import { HiOutlineIdentification } from "react-icons/hi";
 
@@ -48,7 +48,7 @@ const IdentifyFrame = ({ history }) => {
         // sessionStorage.removeItem('jwt');
         const jwt = sessionStorage.getItem('jwt');
         if( jwt ) history.replace('/back-office');
-    }, []);
+    }, [history]);
 
     return <Box className="frame identify-frame">
         { isLoading && <LoadingFilter /> }

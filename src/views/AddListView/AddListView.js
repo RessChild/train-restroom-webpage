@@ -26,18 +26,23 @@ const AddListView = ({ history }) => {
         dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: true }});
         try {
             const { data } = await axios.post('/back-office/add-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
-            console.log(data);
-            // 고를 수 있는 페이지 최대치를 넘어가면 최대 페이지 갱신
-            // 그 외엔 입력값 처리
-            if( !data ) return alert('권한이 없어요.');
+            if( !data ) {
+                alert('획득한 정보가 없어요.');
+                return dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: false }});
+            }
+
+            // token 갱신
+            if( data.new_token ) sessionStorage.setItem('jwt', data.new_token);
+
+            // 고를 수 있는 페이지 최대치를 넘어가면 최대 페이지 갱신, 그 외엔 입력값 처리
             if ( data.totalPage < filter.page ) dispatch({ type: AddListAction.UPDATE_FILTER, data: { "page": Math.min(filter.page, data.totalPage) }});
             else dispatch({ type: AddListAction.UPDATE_STATE, data: { ...data, checkList: {}, isLoading: false } });
         } catch (e) {
             // cancel 로 인한 경우
             if( axios.isCancel(e) ) return;
-            const { response } = e;
 
             // 권한 만료 확인
+            const { response } = e;
             if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
                 sessionStorage.removeItem('jwt');
                 alert('권한 기한이 만료되었습니다.');
@@ -91,8 +96,11 @@ const AddListView = ({ history }) => {
 
         if( !yesOrNo ) return; // 거절하면 종료
         try {
-            const { data } = await axios.post('/back-office/add-read', { list }, { cancelToken: source.token });
-            // console.log(data);
+            const { data } = await axios.post('/back-office/add-read', { list, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
+
+            // token 갱신
+            if( data.new_token ) sessionStorage.setItem('jwt', data.new_token);
+
             if ( !data.ok || !data.nModified ) return; // 갱신된 값이 없으면 무시
             axiosRequest();
         } catch (e) {
