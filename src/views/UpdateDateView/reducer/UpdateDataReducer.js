@@ -1,5 +1,6 @@
 const updateDataInit = {
     filter: {
+        railOprIsttCd: '',
         lnCd: '',
         stinCd: '',
     },
@@ -26,7 +27,6 @@ const updateDataRudcer = (state, action) => {
                 ...state,
                 "filter": {
                     ...state["filter"],
-                    "page": 0, // 필터값이 바뀌면 첫 페이지로 이동
                     ...action.data, // 페이지 값이 변한 경우, 덮어씀
                 }
             };

@@ -5,3 +5,13 @@
 .default-opt {
     display: none;
 }
+.restroom-list {
+    display: flex;
+    flex-direction: column;
+}
+.restroom-data {
+    border: 1px black dashed;
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 0.5rem;
+}
