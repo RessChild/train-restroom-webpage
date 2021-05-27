@@ -6,7 +6,7 @@ import { FcSearch } from "react-icons/fc";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
 import { updateDataInit, updateDataRudcer, UpdateDataAction } from "./reducer/UpdateDataReducer";
-import { tableColumn } from "./data/UpdateDataData";
+import { splitedTableColumn } from "./data/UpdateDataData";
 
 import "../DefaultView.css";
 import "./UpdateDataView.css";
@@ -15,12 +15,12 @@ const EditDataView = () => {
     const source = axios.CancelToken.source();
     
     const [ state, dispatch ] = useReducer(updateDataRudcer, updateDataInit);
-    const { filter, isLoading, lineList, stationList, restroomList } = state;
+    const { filter, isLoading, station, lineList, stationList, restroomList } = state;
 
     // 노선 종류 요청
     const axiosRequestTrain = async () => {
         const jwt = sessionStorage.getItem('jwt');
-        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
+        // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
             const { data } = await axios.post('/back-office/edit-train', { jwt }, { cancelToken: source.token });
             if( !data ) {
@@ -43,9 +43,9 @@ const EditDataView = () => {
     const axiosRequestLine = async () => {
         const jwt = sessionStorage.getItem('jwt');
         dispatch({ type: UpdateDataAction.UPDATE_FILTER, data: { "stinCd": "" }});
-        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
+        // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post(`/back-office/edit-line/${filter.railOprIsttCd}/${filter.lnCd}`, { jwt }, { cancelToken: source.token })
+            const { data } = await axios.post(`/back-office/edit-line`, { jwt, ...filter }, { cancelToken: source.token })
             if ( !data ) {
                 alert("획득한 역 정보가 없어요.");
                 return;
@@ -65,10 +65,15 @@ const EditDataView = () => {
     // 특정 역의 화장실 요청
     const axiosRequestStation = async () => {
         const jwt = sessionStorage.getItem('jwt');
-        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
+        
+        const ln_name = lineList.find( line => line.lnCd === filter.lnCd );
+        const stin_name = stationList.find( station => station.stinCd === filter.stinCd );
+        const name = `${stin_name.stinNm} ( ${ln_name.lnNm} )`
+
+        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: name, restroomList: [] }});
 
         try {
-            const { data } = await axios.post(`/back-office/edit-station/${filter.railOprIsttCd}/${filter.lnCd}/${filter.stinCd}`, { jwt }, { cancelToken: source.token })
+            const { data } = await axios.post(`/back-office/edit-station`, { jwt, ...filter }, { cancelToken: source.token })
             if( !data ) {
                 alert('획득한 화장실 정보가 없어요.')
                 return;
@@ -84,6 +89,33 @@ const EditDataView = () => {
             alert('데이터 요청 중, 문제가 발생하였습니다.');
         }
     };
+
+    // 화장실 정보 수정
+    const axiosRequestEdit = async (r_id) => {
+        const jwt = sessionStorage.getItem('jwt');
+        const edit_restroom = restroomList.find( ({ _id }) => _id === r_id );
+        console.log(edit_restroom);
+        // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
+
+        try {
+            const { data } = await axios.post(`/back-office/edit-restroom`, { jwt, edit_restroom }, { cancelToken: source.token })
+            if( !data ) {
+                alert('화장실 정보 수정 중, 오류가 발생했어요.');
+                return;
+            }
+
+            const { new_token, ...others } = data;
+            if( new_token ) sessionStorage.setItem('jwt', new_token);
+            console.log(others);
+            // alert('정보 수정에 성공하였습니다.');
+            // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { ...others, isLoading: false }});
+        } catch (e) {
+            if( axios.isCancel(e) ) return;
+            
+            console.log("EditDataView axios error", e);
+            alert('정보 수정에 실패하였습니다.');
+        }
+    }
 
     // 초기 로딩
     useEffect(() => {
@@ -113,6 +145,11 @@ const EditDataView = () => {
     const onClickSearch = () => {
         axiosRequestStation();
     };
+    // 수정버튼
+    const onClickEdit = ({ currentTarget: { id }}) => {
+        const [ component, r_id ] = id.split('-');
+        axiosRequestEdit(r_id);
+    }
     
     return <>
         { isLoading && <LoadingFilter /> }
@@ -122,24 +159,47 @@ const EditDataView = () => {
                     <option value="" className="default-opt">-------------- 노선 선택 --------------</option>
                     { lineList.map( ({ railOprIsttCd, lnCd, lnNm }) => <option key={`train-${railOprIsttCd}-${lnCd}`} value={`${railOprIsttCd}-${lnCd}`}>{ lnNm }</option>) }
                 </select>
-                <select id="select-stinCd" className="select-option" defaultValue="" onChange={onChangeSelect}>
+                <select id="select-stinCd" className="select-option" defaultValue="" onChange={onChangeSelect} disabled={stationList.length <= 0}>
                     <option value="" className="default-opt">-------------- 역명 선택 --------------</option>
                     { stationList.map( ({ stinCd, stinNm }) => <option key={`station-${stinCd}`} value={stinCd}>{ stinNm }</option> ) }
                 </select>
-                <Button size="small" variant="outlined" onClick={onClickSearch}>
+                <Button size="small" color="secondary" variant="outlined" onClick={onClickSearch} disabled={!filter.stinCd}>
                     <FcSearch size="2rem" />
                 </Button>
             </Box>
-            <Box className="restroom-list">
-                { /* 앞쪽에 수정된 데이터가 있는지 표기하기 */}
-                { /*명칭 박아버리기 (어느 역, 어느 정거장인지)*/ }
-                { restroomList.map( (restroom, idx) => 
-                    <Box key={`restroom-${idx}`} className="restroom-data">
-                        { tableColumn.map( ({ key }) => <input key={`column-${idx}-${key}`} defaultValue={restroom[key]} /> ) }
-                    </Box>
-                ) }
-            </Box>
-            <button>추가하기 버튼</button>
+            { /* 앞쪽에 수정된 데이터가 있는지 표기하기 */ }
+            {
+                station &&
+                <Box>
+                    <Box className="selected-station">{ station }</Box>
+                    <Box className="restroom-list">
+                        {
+                            restroomList.map( restroom =>
+                                <Box key={`restroom-${restroom._id}`} className="restroom-box">
+                                    {
+                                        splitedTableColumn.map( (tableColumn, idx) => 
+                                            <Box key={`restroom-${restroom._id}-${idx}`} className="restroom-line">
+                                            { 
+                                                tableColumn.map( ({ name, key }) => 
+                                                    <Box key={`column-${restroom._id}-${key}`} className="restroom-column">
+                                                        <Box className="restroom-name">{`${name} :`}</Box>
+                                                        <input className="restroom-input" defaultValue={restroom[key]} />
+                                                    </Box>
+                                                )
+                                            }
+                                            </Box>
+                                        )
+                                    }
+                                    <Box className="restroom-footer">
+                                        <button id={`editBtn-${restroom._id}`} variant="contained" onClick={onClickEdit}>수정하기</button>
+                                    </Box>
+                                </Box>
+                            )
+                        }
+                    </Box>            
+                    <button>추가하기 버튼</button>
+                </Box>
+            }
         </Box>
     </>
 };

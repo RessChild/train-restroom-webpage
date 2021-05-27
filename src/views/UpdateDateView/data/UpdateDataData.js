@@ -10,7 +10,7 @@ const typeFilter = {
     3: "기타",
 };
 
-export const tableColumn = [
+const tableColumn = [
     {
         key: "dtlLoc",
         name: "가까운 출구",
@@ -40,6 +40,16 @@ export const tableColumn = [
         // 숫자 값
     },
 ];
+
+// 화면 출력을 위해, 일정 단위로 정보를 쪼개서 제공
+const SPLIT_NUM = 3;
+const splitColumn = () => {
+    let new_table = [];
+    for(let k=0; k < tableColumn.length; k += SPLIT_NUM)
+        new_table.push( tableColumn.slice(k, k + SPLIT_NUM) );
+    return new_table;
+}
+export const splitedTableColumn = splitColumn();
 
 /*
 diapExchNum: null

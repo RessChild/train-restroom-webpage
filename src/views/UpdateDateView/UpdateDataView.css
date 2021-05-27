@@ -1,3 +1,8 @@
+/* 역 선택 관련 */
+.filter-bar {
+    border-bottom: 2px gray solid;
+    padding: 0.2rem;
+}
 .select-option {
     margin: 0.5rem;
     padding: 0.5rem;
@@ -5,13 +10,49 @@
 .default-opt {
     display: none;
 }
+
+/* 선택된 역 정보 관련 */
+.selected-station {
+    margin: 1rem 0.5rem 0.5rem 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #020715;
+}
 .restroom-list {
     display: flex;
     flex-direction: column;
 }
-.restroom-data {
+.restroom-box {
     border: 1px black dashed;
     border-radius: 1rem;
     padding: 1rem;
     margin: 0.5rem;
+}
+.restroom-line {
+    display: flex;
+    padding: 0.5rem 0;
+}
+.restroom-column {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    text-align: end;
+    padding: 0rem 0.5rem;
+}
+.restroom-name {
+    width: 5rem;
+    font-size: 0.8rem;
+    padding-right: 0.3rem;
+}
+.restroom-column > input {
+    padding: 0.5rem;
+    flex: 1;
+}
+.restroom-footer {
+    /* background-color: #aaa; */
+    display: flex;
+    justify-content: flex-end;
+    margin: 0.2rem 0.5rem;
 }

@@ -7,6 +7,7 @@ const updateDataInit = {
     lineList: [], // 노선 정보
     stationList: [], // 노선별 역 정보
     restroomList: [], // 역별 화장실 정보
+    station: '', // 현재 선택된 역명 (노선 포함)
     isLoading: false,
 };
 
