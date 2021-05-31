@@ -63,13 +63,11 @@ const AddListView = ({ history }) => {
 
     // 체크박스 관련
     const onChangeCheckboxAll = ({ currentTarget: { checked }}) => {
-        // console.log(checked);
         const new_list = addList.reduce((acc, { _id }) => ({ ...acc, [_id]: checked }), {});
         dispatch({ type: AddListAction.UPDATE_STATE, data: { checkList: new_list } });
     }
     const onChangeCheckbox = ({ currentTarget: { id, checked } }) => {
         const [ doc, target ] = id.split('-');
-        // console.log(target);
         const new_list = { ...checkList, [target]: checked };
         dispatch({ type: AddListAction.UPDATE_STATE, data: { checkList: new_list } });
     }
@@ -105,6 +103,15 @@ const AddListView = ({ history }) => {
             axiosRequest();
         } catch (e) {
             if(axios.isCancel(e)) return;
+
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+            
             alert("승인 처리 중, 에러가 발생하였습니다.");
         }
     }
@@ -115,8 +122,6 @@ const AddListView = ({ history }) => {
         if( !yesOrNo ) return; // 거절하면 종료
     }
 
-    // 고민해야할 부분
-    // 1. 요청 리스트가 없는 경우
     return <>
         { isLoading && <LoadingFilter /> }
         <Box className="view-frame">
@@ -144,9 +149,9 @@ const AddListView = ({ history }) => {
                     <IconButton className="select-bar-btn" disabled={ !(addList.reduce((acc, add) => acc | checkList[add._id], false)) } onClick={onClickActionRead}>
                         <GoCheck color="#FF9100"/>
                     </IconButton>
-                    <IconButton className="select-bar-btn" disabled={ !(addList.reduce((acc, add) => acc | checkList[add._id], false)) } onClick={onClickActionRemove}>
+                    {/* <IconButton className="select-bar-btn" disabled={ !(addList.reduce((acc, add) => acc | checkList[add._id], false)) } onClick={onClickActionRemove}>
                         <GoTrashcan color="red"/>
-                    </IconButton>
+                    </IconButton> */}
                 </Box>
             </Box>
             <TableContainer>
@@ -165,7 +170,12 @@ const AddListView = ({ history }) => {
                                 <TableCell padding="checkbox">
                                     <Checkbox id={`checkbox-${add._id}`} key={`checkbox-${add._id}`} checked={!!checkList[add._id]} onChange={onChangeCheckbox}/>
                                 </TableCell>
-                                { tableColumn.map( ({ key, filter, padding }) => <TableCell padding={padding} key={`row-${add._id}-${key}`}>{ filter ? filter[add[key]] : add[key] }</TableCell>) }
+                                { 
+                                    tableColumn.map( ({ key, filter, padding }) => 
+                                        <TableCell padding={padding} key={`row-${add._id}-${key}`}>
+                                            { filter ? filter[add[key]] : add[key] }
+                                        </TableCell>)
+                                }
                             </TableRow> )
                         }
                     </TableBody>

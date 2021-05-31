@@ -46,7 +46,7 @@ const updateDataRudcer = (state, action) => {
                 "restroomList": state.restroomList.map( restroom => 
                         restroom._id !== action.r_id 
                             ? restroom 
-                            : { ...restroom, ...action.data } 
+                            : { ...restroom, ...action.data, isChanged: true } 
                     ),
             };
         case UpdateDataAction.ADD_RESTROOM:

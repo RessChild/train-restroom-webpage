@@ -35,5 +35,9 @@ export const tableColumn = [
     {
         key: "detail",
         name: "상세 내용"
-    }
+    },
+    {
+        key: "userPhone",
+        name: "작성자"
+    },
 ];

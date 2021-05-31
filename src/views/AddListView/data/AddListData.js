@@ -28,5 +28,9 @@ export const tableColumn = [
     { 
         key: "gateInotDvNm",
         name: "출구 안/밖"
-    }
+    },
+    {
+        key: "userPhone",
+        name: "작성자"
+    },
 ];

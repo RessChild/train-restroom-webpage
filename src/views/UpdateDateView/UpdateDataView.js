@@ -3,6 +3,7 @@ import { Box, Button, IconButton, TextField } from "@material-ui/core";
 import axios from "axios";
 
 import { FcSearch } from "react-icons/fc";
+import { FiEdit } from "react-icons/fi";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
 import { updateDataInit, updateDataRudcer, UpdateDataAction } from "./reducer/UpdateDataReducer";
@@ -11,7 +12,7 @@ import { splitedTableColumn } from "./data/UpdateDataData";
 import "../DefaultView.css";
 import "./UpdateDataView.css";
 
-const EditDataView = () => {
+const EditDataView = ({ history }) => {
     const source = axios.CancelToken.source();
     
     const [ state, dispatch ] = useReducer(updateDataRudcer, updateDataInit);
@@ -34,6 +35,14 @@ const EditDataView = () => {
         } catch (e) {
             if( axios.isCancel(e) ) return;
             
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+
             console.log("EditDataView axios error", e);
             alert('데이터 요청 중, 문제가 발생하였습니다.');
         }
@@ -57,6 +66,14 @@ const EditDataView = () => {
         } catch (e) {
             if( axios.isCancel(e) ) return;
             
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+
             console.log("EditDataView axios error", e);
             alert('데이터 요청 중, 문제가 발생하였습니다.');
         }
@@ -70,7 +87,7 @@ const EditDataView = () => {
         const stin_name = stationList.find( station => station.stinCd === filter.stinCd );
         const name = `${stin_name.stinNm} ( ${ln_name.lnNm} )`
 
-        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: { name, _id: '' }, restroomList: [] }});
+        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: { name: '', _id: '' }, restroomList: [] }});
 
         try {
             const { data } = await axios.post(`/back-office/edit-station`, { jwt, ...filter }, { cancelToken: source.token })
@@ -85,6 +102,14 @@ const EditDataView = () => {
         } catch (e) {
             if( axios.isCancel(e) ) return;
             
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+
             console.log("EditDataView axios error", e);
             alert('데이터 요청 중, 문제가 발생하였습니다.');
         }
@@ -93,11 +118,10 @@ const EditDataView = () => {
     // 화장실 정보 수정
     const axiosRequestEdit = async (r_id) => {
         const jwt = sessionStorage.getItem('jwt');
-        let edit_restroom = restroomList.find( ({ _id }) => _id === r_id );
+        let { isChanged, ...edit_restroom} = restroomList.find( ({ _id }) => _id === r_id );
         // edit_restroom.station = edit_restroom.station || filter.stinCd;
         // console.log(edit_restroom);
-        // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
-
+        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
             const { data } = await axios.post(`/back-office/edit-restroom`, { jwt, edit_restroom }, { cancelToken: source.token })
             if( !data ) {
@@ -115,6 +139,14 @@ const EditDataView = () => {
             alert('정보 수정에 성공하였습니다.');
         } catch (e) {
             if( axios.isCancel(e) ) return;
+            
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
             
             console.log("EditDataView axios error", e);
             alert('정보 수정에 실패하였습니다.');
@@ -191,7 +223,6 @@ const EditDataView = () => {
                     <FcSearch size="2rem" />
                 </Button>
             </Box>
-            { /* 앞쪽에 수정된 데이터가 있는지 표기하기 */ }
             {
                 station._id &&
                 <Box>
@@ -200,6 +231,7 @@ const EditDataView = () => {
                         {
                             restroomList.map( restroom =>
                                 <Box key={`restroom-${restroom._id}`} className="restroom-box">
+                                    <FiEdit className={ `icon-${ restroom.isChanged ? "" : "un" }edited` } color="red" size="1.2rem" />
                                     {
                                         splitedTableColumn.map( (tableColumn, idx) => 
                                             <Box key={`restroom-${restroom._id}-${idx}`} className="restroom-line">
