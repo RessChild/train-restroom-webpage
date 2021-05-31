@@ -1,14 +1,16 @@
-const readFilter = {
-    true: <></>,
-    false: <></>,
-}
-
-const typeFilter = {
-    0: "출구 정보가 다름",
-    1: "개찰구 안/밖의 정보가 다름",
-    2: "화장실이 존재하지 않음",
-    3: "기타",
-};
+const gateOpt = [
+    { name: "내", value: "내" },
+    { name: "외", value: "외" },
+];
+const groundOpt = [
+    { name: "지상", value: "지상" },
+    { name: "지하", value: "지하" },
+];
+const genderOpt = [
+    { name: "남자", value: "남자" },
+    { name: "여자", value: "여자" },
+    { name: "공용", value: "공용" },
+];
 
 const tableColumn = [
     {
@@ -20,24 +22,27 @@ const tableColumn = [
         name: "출구 번호"
     },
     {
+        key: "stinFlor",
+        name: "층 수",
+        // 숫자 값
+    },
+    {
         key: "gateInotDvNm",
-        name: "게이트 안/밖"
+        name: "게이트 안/밖",
+        option: gateOpt,
         // 가질 수 있는 값은 내,외
     },
     {
         key: "grndDvNm",
-        name: "지상/지하"
+        name: "지상/지하",
+        option: groundOpt,
         // 지상, 지하
     },
     {
         key: "mlFmlDvNm",
-        name: "공용 여부"
+        name: "공용 여부",
+        option: genderOpt,
         // 공용, 남자, 여자
-    },
-    {
-        key: "stinFlor",
-        name: "층 수",
-        // 숫자 값
     },
 ];
 
@@ -50,6 +55,13 @@ const splitColumn = () => {
     return new_table;
 }
 export const splitedTableColumn = splitColumn();
+
+// 새 값을 넣기위한 초기 세팅형태
+export const DEFAULT_ID = 'NEW_RESTROOM';
+const createNewRestroom = () => {
+    return tableColumn.reduce((acc, { key }) => ({ ...acc, [key]: "" }) , { _id: DEFAULT_ID });
+};
+export const initTableColumn = createNewRestroom();
 
 /*
 diapExchNum: null

@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { Fragment, useEffect, useReducer } from "react";
 import { Box, Button, IconButton, TextField } from "@material-ui/core";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ const EditDataView = () => {
     const source = axios.CancelToken.source();
     
     const [ state, dispatch ] = useReducer(updateDataRudcer, updateDataInit);
-    const { filter, isLoading, station, lineList, stationList, restroomList } = state;
+    const { filter, isLoading, addNew, station, lineList, stationList, restroomList } = state;
 
     // 노선 종류 요청
     const axiosRequestTrain = async () => {
@@ -70,7 +70,7 @@ const EditDataView = () => {
         const stin_name = stationList.find( station => station.stinCd === filter.stinCd );
         const name = `${stin_name.stinNm} ( ${ln_name.lnNm} )`
 
-        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: name, restroomList: [] }});
+        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: { name, _id: '' }, restroomList: [] }});
 
         try {
             const { data } = await axios.post(`/back-office/edit-station`, { jwt, ...filter }, { cancelToken: source.token })
@@ -79,9 +79,9 @@ const EditDataView = () => {
                 return;
             }
 
-            const { new_token, ...others } = data;
+            const { new_token, station_id, ...others } = data;
             if( new_token ) sessionStorage.setItem('jwt', new_token);
-            dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { ...others, isLoading: false }});
+            dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { ...others, station: { name: name, _id: station_id }, isLoading: false }});
         } catch (e) {
             if( axios.isCancel(e) ) return;
             
@@ -93,8 +93,9 @@ const EditDataView = () => {
     // 화장실 정보 수정
     const axiosRequestEdit = async (r_id) => {
         const jwt = sessionStorage.getItem('jwt');
-        const edit_restroom = restroomList.find( ({ _id }) => _id === r_id );
-        console.log(edit_restroom);
+        let edit_restroom = restroomList.find( ({ _id }) => _id === r_id );
+        // edit_restroom.station = edit_restroom.station || filter.stinCd;
+        // console.log(edit_restroom);
         // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
 
         try {
@@ -106,9 +107,12 @@ const EditDataView = () => {
 
             const { new_token, ...others } = data;
             if( new_token ) sessionStorage.setItem('jwt', new_token);
-            console.log(others);
-            // alert('정보 수정에 성공하였습니다.');
-            // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { ...others, isLoading: false }});
+            
+            const { success, saved_id } = others;
+            if ( !success ) return alert("정보 수정에 실패하였습니다."); 
+
+            dispatch({ type: UpdateDataAction.UPDATE_RESTROOM, saved_id, data: { isLoading: false }});
+            alert('정보 수정에 성공하였습니다.');
         } catch (e) {
             if( axios.isCancel(e) ) return;
             
@@ -126,8 +130,8 @@ const EditDataView = () => {
     }, [filter.railOprIsttCd, filter.lnCd]);
 
     // useEffect(() => {
-    //     console.log(filter);
-    // }, [filter]);
+    //     console.log('restroomList', restroomList);
+    // }, [restroomList]);
 
     /* 액션 관련 함수 */
     // select 변경
@@ -145,12 +149,32 @@ const EditDataView = () => {
     const onClickSearch = () => {
         axiosRequestStation();
     };
+    // Input 필드 변경
+    const onChangeInput = ({ currentTarget: { id, value }}) => {
+        const [ component, r_id, target ] = id.split('-');
+        // console.log(id, target, "변경");
+        dispatch({ type: UpdateDataAction.EDIT_RESTROOM, r_id, data: { [target]: value }});
+    }
+    // 라디오버튼 변경
+    const onChangeRadio = ({ currentTarget: { id, value }}) => {
+        const [ component, r_id, target ] = id.split('-');
+        dispatch({ type: UpdateDataAction.EDIT_RESTROOM, r_id, data: { [target]: value }});
+    }
     // 수정버튼
     const onClickEdit = ({ currentTarget: { id }}) => {
         const [ component, r_id ] = id.split('-');
         axiosRequestEdit(r_id);
     }
-    
+    // 삭제버튼
+    const onClickRemove = ({ currentTarget: { id }}) => {
+        const [ component, r_id ] = id.split('-');
+        console.log(component, r_id);
+    };
+    // 새 화장실 추가버튼
+    const onClickNewRestroom = () => {
+        dispatch({ type: UpdateDataAction.ADD_RESTROOM, s_id: station._id });
+    }
+
     return <>
         { isLoading && <LoadingFilter /> }
         <Box className="view-frame">
@@ -169,9 +193,9 @@ const EditDataView = () => {
             </Box>
             { /* 앞쪽에 수정된 데이터가 있는지 표기하기 */ }
             {
-                station &&
+                station._id &&
                 <Box>
-                    <Box className="selected-station">{ station }</Box>
+                    <Box className="selected-station">{ station.name }</Box>
                     <Box className="restroom-list">
                         {
                             restroomList.map( restroom =>
@@ -180,10 +204,20 @@ const EditDataView = () => {
                                         splitedTableColumn.map( (tableColumn, idx) => 
                                             <Box key={`restroom-${restroom._id}-${idx}`} className="restroom-line">
                                             { 
-                                                tableColumn.map( ({ name, key }) => 
+                                                tableColumn.map( ({ name, key, option }) => 
                                                     <Box key={`column-${restroom._id}-${key}`} className="restroom-column">
                                                         <Box className="restroom-name">{`${name} :`}</Box>
-                                                        <input className="restroom-input" defaultValue={restroom[key]} />
+                                                        {
+                                                            option 
+                                                            ? option.map(({ name, value }) => {
+                                                                    const str = `radio-${restroom._id}-${key}`;
+                                                                    return <Box key={`${str}-${name}`}>
+                                                                        <input id={str} name={str} type="radio" value={value} checked={value === restroom[key]} onChange={onChangeRadio} />
+                                                                        { name }
+                                                                    </Box>
+                                                                })
+                                                            : <input id={`input-${restroom._id}-${key}`} className="restroom-input" value={restroom[key]} onChange={onChangeInput} />
+                                                        }
                                                     </Box>
                                                 )
                                             }
@@ -192,12 +226,13 @@ const EditDataView = () => {
                                     }
                                     <Box className="restroom-footer">
                                         <button id={`editBtn-${restroom._id}`} variant="contained" onClick={onClickEdit}>수정하기</button>
+                                        <button id={`removeBtn-${restroom._id}`} variant="contained" onClick={onClickRemove}>삭제하기</button>
                                     </Box>
                                 </Box>
                             )
                         }
-                    </Box>            
-                    <button>추가하기 버튼</button>
+                    </Box>
+                    <button disabled={addNew} onClick={onClickNewRestroom}>추가하기</button>
                 </Box>
             }
         </Box>
