@@ -59,7 +59,7 @@ export const splitedTableColumn = splitColumn();
 // 새 값을 넣기위한 초기 세팅형태
 export const DEFAULT_ID = 'NEW_RESTROOM';
 const createNewRestroom = () => {
-    return tableColumn.reduce((acc, { key }) => ({ ...acc, [key]: "" }) , { _id: DEFAULT_ID });
+    return tableColumn.reduce((acc, { key }) => ({ ...acc, [key]: "" }) , { _id: DEFAULT_ID, isChanged: true });
 };
 export const initTableColumn = createNewRestroom();
 

@@ -23,6 +23,7 @@ const UpdateDataAction = {
     EDIT_RESTROOM: "EDIT_RESTROOM",
     ADD_RESTROOM: "ADD_RESTROOM",
     UPDATE_RESTROOM: "UPDATE_RESTROOM",
+    REMOVE_RESTROOM: "REMOVE_RESTROOM",
 };
 
 const updateDataRudcer = (state, action) => {
@@ -59,15 +60,24 @@ const updateDataRudcer = (state, action) => {
             return {
                 ...state,
                 ...action.data,
-                "restroomList": !action.saved_id // id 값 수정이 필요없다면
-                    ? state.restroomList // 그대로
-                    : state.restroomList.map( restroom => // 그 외엔 찾아서 수정
-                        restroom._id !== DEFAULT_ID
+                "restroomList": state.restroomList.map( restroom => // 그 외엔 찾아서 수정
+                        // 신규 정보인 경우는 default_id랑 비교, 기존 정보면 saved_id 랑 비교
+                        restroom._id !== (action.mode ? DEFAULT_ID : action.saved_id)
                             ? restroom
-                            : { ...restroom, _id: action.saved_id }
+                            : { ...restroom, _id: action.saved_id, isChanged: false }
                     ),
+                // 신규 정보가 저장 안된 경우는 기존 상태를 참고함
                 addNew: !action.saved_id && state.addNew,
-            }
+            };
+        case UpdateDataAction.REMOVE_RESTROOM: 
+            return {
+                ...state,
+                ...action.data,
+                "restroomList": state.restroomList.filter(({ _id }) => 
+                    _id !== action.removed_id ),
+                // 신규가 삭제된 경우면 무조건 false 로 바꾸고, 그 외엔 기존값을 따라감
+                addNew: action.removed_id !== DEFAULT_ID && state.addNew,
+            };
         default:
             throw new Error("undefined addListReducer action");
     }

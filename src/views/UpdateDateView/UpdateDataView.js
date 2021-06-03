@@ -7,7 +7,7 @@ import { FiEdit } from "react-icons/fi";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
 import { updateDataInit, updateDataRudcer, UpdateDataAction } from "./reducer/UpdateDataReducer";
-import { splitedTableColumn } from "./data/UpdateDataData";
+import { splitedTableColumn, DEFAULT_ID } from "./data/UpdateDataData";
 
 import "../DefaultView.css";
 import "./UpdateDataView.css";
@@ -118,7 +118,7 @@ const EditDataView = ({ history }) => {
     // 화장실 정보 수정
     const axiosRequestEdit = async (r_id) => {
         const jwt = sessionStorage.getItem('jwt');
-        let { isChanged, ...edit_restroom} = restroomList.find( ({ _id }) => _id === r_id );
+        let { isChanged, ...edit_restroom } = restroomList.find( ({ _id }) => _id === r_id );
         // edit_restroom.station = edit_restroom.station || filter.stinCd;
         // console.log(edit_restroom);
         dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
@@ -135,9 +135,47 @@ const EditDataView = ({ history }) => {
             const { success, saved_id } = others;
             if ( !success ) return alert("정보 수정에 실패하였습니다."); 
 
-            dispatch({ type: UpdateDataAction.UPDATE_RESTROOM, saved_id, data: { isLoading: false }});
-            alert('정보 수정에 성공하였습니다.');
+            // 화면정보 갱신
+            dispatch({ type: UpdateDataAction.UPDATE_RESTROOM, 
+                mode: !!saved_id, saved_id: saved_id || r_id, 
+                data: { isLoading: false }});
+            alert('화장실 수정에 성공하였습니다.');
         } catch (e) {
+            if( axios.isCancel(e) ) return;
+            
+            // 권한 만료 확인
+            const { response } = e;
+            if( response && response.data && response.data.error && response.data.error.name === "TokenExpiredError" ) {
+                sessionStorage.removeItem('jwt');
+                alert('권한 기한이 만료되었습니다.');
+                return history.push('/identify'); // 인증페이지로 이동
+            }
+            
+            console.log("EditDataView axios error", e);
+            alert('정보 수정에 실패하였습니다.');
+        }
+    }
+
+    // 화장실 정보 삭제
+    const axiosRequestRemove = async (r_id) => {
+        // 새로 만든 값이었으면 그냥 빼내면 끝
+        if( r_id === DEFAULT_ID ) return dispatch({ type: UpdateDataAction.REMOVE_RESTROOM, removed_id: r_id });
+
+        const jwt = sessionStorage.getItem('jwt');
+        dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
+        // 로딩상태로 변경
+        try {
+            const { data } = await axios.post('/back-office/remove-restroom', { jwt, remove_restroom: r_id }, { cancelToken: source.token });
+            if(!data) return alert("화장실 삭제 중, 문제가 발생했어요.");
+            
+            // 결과 확인 및 결과값 반영
+            const { success } = data;
+            if( !success ) return alert("삭제된 화장실이 없어요.");
+            
+            dispatch({ type: UpdateDataAction.REMOVE_RESTROOM, removed_id: r_id, data: { isLoading: false }});
+            alert("화장실 삭제에 성공했습니다.");
+        } catch (e) {
+            // 취소인 경우
             if( axios.isCancel(e) ) return;
             
             // 권한 만료 확인
@@ -200,7 +238,8 @@ const EditDataView = ({ history }) => {
     // 삭제버튼
     const onClickRemove = ({ currentTarget: { id }}) => {
         const [ component, r_id ] = id.split('-');
-        console.log(component, r_id);
+        axiosRequestRemove(r_id);
+        // console.log(component, r_id);
     };
     // 새 화장실 추가버튼
     const onClickNewRestroom = () => {
@@ -243,7 +282,7 @@ const EditDataView = ({ history }) => {
                                                             option 
                                                             ? option.map(({ name, value }) => {
                                                                     const str = `radio-${restroom._id}-${key}`;
-                                                                    return <Box key={`${str}-${name}`}>
+                                                                    return <Box className="restroom-input restroom-input-radio" key={`${str}-${name}`}>
                                                                         <input id={str} name={str} type="radio" value={value} checked={value === restroom[key]} onChange={onChangeRadio} />
                                                                         { name }
                                                                     </Box>
