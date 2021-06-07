@@ -1,6 +1,9 @@
-
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import { defaultFrameRoutePath, frameRoute } from "./router";
+
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const App = () => {
   

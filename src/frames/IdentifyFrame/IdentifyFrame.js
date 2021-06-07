@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import { Box, Button, TextField } from "@material-ui/core";
 
 import { HiOutlineIdentification } from "react-icons/hi";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
+import request from "../../request";
 
 import "../DefaultFrame.css";
 import "./IdentifyFrame.css";
 
 const IdentifyFrame = ({ history }) => {
     
+    // const request = setBaseURL();
+
     // 화면 구성용 변수
     const [ isLoading, setIsLoading ] = useState(false);
     const [ pw, setPw ] = useState('');
@@ -23,7 +26,9 @@ const IdentifyFrame = ({ history }) => {
         setIsLoading(true);
         try {
             // 암호 확인
-            const { data: { login, jwt } } = await axios.post('/back-office', { pw });
+            const result = await request.post('/back-office', { pw });
+            const { data: { login, jwt }} = result;
+            // console.log(result, login, jwt);
             if( login && jwt ) {
                 // console.log(jwt);
                 sessionStorage.setItem('jwt', jwt); // jwt 정보 저장
@@ -38,7 +43,7 @@ const IdentifyFrame = ({ history }) => {
             setIsLoading(false);
             alert('로그인 시도 중, 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
             console.log("login page error", e);
-            throw new Error('login page error');
+            // throw new Error('login page error');
         }
     }
 

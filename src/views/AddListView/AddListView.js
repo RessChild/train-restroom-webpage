@@ -6,6 +6,7 @@ import { GoChecklist, GoCheck, GoTrashcan } from "react-icons/go"
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
+import request from "../../request";
 
 import { addListInit, AddListAction, addListRudcer } from "./reducer/AddListReducer";
 import { tableColumn } from "./data/AddListData";
@@ -25,7 +26,7 @@ const AddListView = ({ history }) => {
     const axiosRequest = async () => {
         dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post('/back-office/add-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/add-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
             if( !data ) {
                 alert('획득한 정보가 없어요.');
                 return dispatch({ type: AddListAction.UPDATE_STATE, data: { isLoading: false }});
@@ -94,7 +95,7 @@ const AddListView = ({ history }) => {
 
         if( !yesOrNo ) return; // 거절하면 종료
         try {
-            const { data } = await axios.post('/back-office/add-read', { list, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/add-read', { list, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
 
             // token 갱신
             if( data.new_token ) sessionStorage.setItem('jwt', data.new_token);

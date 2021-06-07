@@ -8,6 +8,7 @@ import { FiEdit } from "react-icons/fi";
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
 import { updateDataInit, updateDataRudcer, UpdateDataAction } from "./reducer/UpdateDataReducer";
 import { splitedTableColumn, DEFAULT_ID } from "./data/UpdateDataData";
+import request from "../../request";
 
 import "../DefaultView.css";
 import "./UpdateDataView.css";
@@ -23,7 +24,7 @@ const EditDataView = ({ history }) => {
         const jwt = sessionStorage.getItem('jwt');
         // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post('/back-office/edit-train', { jwt }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/edit-train', { jwt }, { cancelToken: source.token });
             if( !data ) {
                 alert("획득한 노선 정보가 없어요.")
                 return;
@@ -54,7 +55,7 @@ const EditDataView = ({ history }) => {
         dispatch({ type: UpdateDataAction.UPDATE_FILTER, data: { "stinCd": "" }});
         // dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post(`/back-office/edit-line`, { jwt, ...filter }, { cancelToken: source.token })
+            const { data } = await request.post(`/back-office/edit-line`, { jwt, ...filter }, { cancelToken: source.token })
             if ( !data ) {
                 alert("획득한 역 정보가 없어요.");
                 return;
@@ -90,7 +91,7 @@ const EditDataView = ({ history }) => {
         dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true, station: { name: '', _id: '' }, restroomList: [] }});
 
         try {
-            const { data } = await axios.post(`/back-office/edit-station`, { jwt, ...filter }, { cancelToken: source.token })
+            const { data } = await request.post(`/back-office/edit-station`, { jwt, ...filter }, { cancelToken: source.token })
             if( !data ) {
                 alert('획득한 화장실 정보가 없어요.')
                 return;
@@ -123,7 +124,7 @@ const EditDataView = ({ history }) => {
         // console.log(edit_restroom);
         dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post(`/back-office/edit-restroom`, { jwt, edit_restroom }, { cancelToken: source.token })
+            const { data } = await request.post(`/back-office/edit-restroom`, { jwt, edit_restroom }, { cancelToken: source.token })
             if( !data ) {
                 alert('화장실 정보 수정 중, 오류가 발생했어요.');
                 return;
@@ -165,7 +166,7 @@ const EditDataView = ({ history }) => {
         dispatch({ type: UpdateDataAction.UPDATE_STATE, data: { isLoading: true }});
         // 로딩상태로 변경
         try {
-            const { data } = await axios.post('/back-office/remove-restroom', { jwt, remove_restroom: r_id }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/remove-restroom', { jwt, remove_restroom: r_id }, { cancelToken: source.token });
             if(!data) return alert("화장실 삭제 중, 문제가 발생했어요.");
             
             // 결과 확인 및 결과값 반영

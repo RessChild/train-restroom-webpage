@@ -1,6 +1,11 @@
 # train-restroom-webpage
 - 철도 화장실 정보 어플용 백오피스
 - ReactJs hook
+- /src/request.js 내의 변수값을 변경할 것
+
+# 실행 명령
+- npm run-script pm2 
+- [ pm2 serve build/ 포트_번호 ]
 
 # 설치 모듈
 - create-react-app 기반으로 생성
@@ -8,6 +13,10 @@
 - material-ui, @material-ui/core
 - react-icons
 - react-spinners-css
+- serve
+- http-proxy-middleware
+- pm2
+- dotenv
 
 # 진행사항
 1. 2021/05/04
@@ -72,12 +81,32 @@
     해당 기능이 추가되면서, axios로 넘어갈 수 있는 불필요한 정보도 안넘어가도록 수정
   - pm2로 돌려보려고 하는 중인데, 잘 안됨 
     ( https://kyeahen.github.io/react.js/React.js-pm2%EB%A1%9C-%EC%9B%B9%ED%8E%98%EC%9D%B4%EC%A7%80-%EB%AC%B4%EC%A4%91%EB%8B%A8-%EC%8B%A4%ED%96%89%ED%95%98%EA%B8%B0/ )
-16. 2021/60/02
+16. 2021/06/02
   - 데이터 수정 아이콘 관련해서 조금 수정이 필요함
     ( 서버쪽 수정이 완료된 경우에도 해당 아이콘을 바꿔주도록 개선이 필요 )
   - 추가된 정보의 삭제 기능 추가
   - '요구사항 삭제' 버튼은 불필요하다 판단되어 임시로 주석처리
-  
+17. 2021/06/03
+  - react 웹서버 배포 
+    ( https://codechacha.com/ko/deploy-react-with-nginx/ )
+  - nginx 대신에 serve 랑 build 사용해서 해결 할 수 있을 것 같음
+    ( https://bziwnsizd.tistory.com/m/43?category=729521 )
+  - 근데 서버 관련해서 적용이 잘 안되는 것 같음.
+    ( https://hello-bryan.tistory.com/122 )
+  - https://chaewonkong.github.io/posts/express-with-react.html
+18. 2021/06/04
+  - 네트워크 관련 ( https://pm2.keymetrics.io/docs/usage/expose/#serving-spa-redirect-all-to-indexhtml )
+    --spa 는 다른 웹페이지 정보를 불러오는 것으로 보임. 반환값이 html 형태
+  - 지금 npm build 로 나온 결과물은 routing 도 딱히 안되는 것 같음. 다른 방식을 찾아야 할듯.
+  - 파일 자체를 찾아가는 방식은 어떠냔 제안이 왔는데, 안될 것 같음.
+    react 기반으로 돌아가다보니, 내부적으로 처리하는 부분도 많고, 메인이 되는 페이지는 강제접근하면 빈 화면으로 보임
+19. 2021/06/07
+  - 서버에서 cors 옵션을 추가하고, 바로 url을 작성하는 형태로 진행하면 가능함
+  - 그래서 dotenv 를 섞어서 axios.baseURL 을 수정하는 작업을 진행중인데, 
+    .env 파일을 읽는 시간이 좀 걸리는지, 자꾸 undefined 가 발생함
+  - 꺙으로 적는 수 밖에 없는건가?
+    ==> 그냥 서버 내에서 값을 변경시키는 방향으로 진행하자.
+    
 # 해야할 것
 - 페이지마다 15개씩 쪼개서 처리
    + 읽음표시랑, 처리표시랑 합치기 (isRead, isClear 중 하나 선택) OK
@@ -95,3 +124,4 @@
   absolute 는 relative 설정된 컴포넌트 정보를 따라감 (기본은 window)
 - axios 에서 catch 로 잡힌 정보는 e.response 에 담겨있음
   so, 서버에서 status(401)이랑 같이 넣은 에러 정보는 e.response.data 에서 탐색 가능
+- package.json 에서 다수의 proxy를 설정할 때는, 각 경로에 대해 { target: "proxy 주소" } 형태의 객체를 대입해야 함

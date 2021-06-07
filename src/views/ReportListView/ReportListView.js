@@ -6,6 +6,7 @@ import { GoChecklist, GoCheck } from "react-icons/go";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 
 import LoadingFilter from "../../components/LoadingFilter/LoadingFilter";
+import request from "../../request";
 
 import { reportListInit, reportListRudcer, ReportListAction } from "./reducer/ReportListReducer";
 import { tableColumn } from "./data/ReportListData";
@@ -25,7 +26,7 @@ const ReportListView = ({ history }) => {
     const axiosRequest = async () => {
         dispatch({ type: ReportListAction.UPDATE_STATE, data: { isLoading: true }});
         try {
-            const { data } = await axios.post('/back-office/report-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/report-list', { ...filter, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
             if( !data ) {
                 alert('획득한 정보가 없어요.');
                 return dispatch({ type: ReportListAction.UPDATE_STATE, data: { isLoading: false }});
@@ -94,7 +95,7 @@ const ReportListView = ({ history }) => {
 
         if( !yesOrNo ) return; // 거절하면 종료
         try {
-            const { data } = await axios.post('/back-office/report-read', { list, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
+            const { data } = await request.post('/back-office/report-read', { list, jwt: sessionStorage.getItem('jwt') }, { cancelToken: source.token });
 
             // token 갱신
             if( data.new_token ) sessionStorage.setItem('jwt', data.new_token);
