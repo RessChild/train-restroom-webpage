@@ -1,7 +1,10 @@
 # train-restroom-webpage
 - 철도 화장실 정보 어플용 백오피스
 - ReactJs hook
+
+# 주의사항
 - /src/request.js 내의 변수값을 변경할 것
+- npm run-script build 로 파일 빌드가 선행되어야 함
 
 # 실행 명령
 - npm run-script pm2 
