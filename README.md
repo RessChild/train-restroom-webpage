@@ -119,6 +119,12 @@
   - ec2 의 private IP / DNS 로도 접근 시도했으나 마찬가지
     ( https://m.blog.naver.com/wideeyed/221715052603 )
   - public IP 는 POST MAN 에서는 정상 작동하나, ec2 쉘 안에선 접근 불가능
+  - https://stackoverflow.com/questions/61766177/react-with-node-js-in-aws-connection-between-react-and-node-issue
+  - https://stackoverflow.com/questions/58717673/axios-sending-network-error-while-status-is-200-ok
+21. 2021/06/27
+  - EC2 문제 해결 ( 서버의 public IP 로 접근시키니 해결됨 )
+    왜 localhost 랑 private IP 는 사용이 안되던건지는 아직도 의문
+  - 이전에 해당 방식이 적용안된 이유는, 스크립트를 바꾸고 새로 build 를 안해서...
 
 # 해야할 것
 - 페이지마다 15개씩 쪼개서 처리
@@ -138,3 +144,4 @@
 - axios 에서 catch 로 잡힌 정보는 e.response 에 담겨있음
   so, 서버에서 status(401)이랑 같이 넣은 에러 정보는 e.response.data 에서 탐색 가능
 - package.json 에서 다수의 proxy를 설정할 때는, 각 경로에 대해 { target: "proxy 주소" } 형태의 객체를 대입해야 함
+- http-proxy-middleware 는 build 시 제대로 적용되지 않음
